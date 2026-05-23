@@ -25,7 +25,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
 
       # ─── Java (required by Gradle / Android SDK) ──────────────────────────
@@ -47,58 +47,38 @@ jobs:
       - name: Build web assets
         run: npm run build
         env:
-          # Expose any required env vars; store secrets in GitHub Secrets
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
 
-      # ─── Sync Capacitor → Android ─────────────────────────────────────────
-      - name: Add & Sync Capacitor Android
-          run: |
+      # ─── Add Android platform only if android/ folder does not exist ──────
+      - name: Add Capacitor Android platform
+        run: |
+          if [ ! -d "android" ]; then
+            echo "android/ not found – running cap add android"
             npx cap add android
-            npx cap sync android
+          else
+            echo "android/ already exists – skipping cap add"
+          fi
 
-      # ─── Patch app name & author in build metadata ────────────────────────
+      # ─── Sync web assets into the Android project ─────────────────────────
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      # ─── Stamp build metadata ─────────────────────────────────────────────
       - name: Set app metadata
         run: |
-          # App name is already "H2 Tracker" in capacitor.config.ts
-          # Stamp the author into the build output for traceability
+          mkdir -p android/app/src/main/assets
           echo "Built by ovrrpo – H2 Tracker" > android/app/src/main/assets/build-info.txt
 
-      # ─── Make Gradle wrapper executable ──────────────────────────────────
-    
-      # ─── Build debug APK ─────────────────────────────────────────────────
+      # ─── Build debug APK ──────────────────────────────────────────────────
       - name: Build debug APK
         working-directory: android
-          run: |
-           chmod +x gradlew
-           ./gradlew assembleDebug --no-daemon --stacktrace
-      # ─── (Optional) Build release APK signed with a keystore ─────────────
-      # Uncomment this block and add the secrets below to your repo to get
-      # a release-signed APK instead of (or in addition to) the debug one.
-      #
-      # Secrets needed:
-      #   KEYSTORE_BASE64   – base64-encoded .jks / .keystore file
-      #   KEY_ALIAS         – alias of the signing key
-      #   KEY_PASSWORD      – password for the key
-      #   STORE_PASSWORD    – password for the keystore
-      #
-      # - name: Decode keystore
-      #   run: |
-      #     echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/h2tracker.jks
-      #
-      # - name: Build release APK
-      #   working-directory: android
-      #   run: |
-      #     ./gradlew assembleRelease --no-daemon \
-      #       -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/android/app/h2tracker.jks \
-      #       -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
-      #       -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-      #       -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
-      # ─── Locate the APK ───────────────────────────────────────────────────
-      - name: Locate APK
-        run: find android -name "*.apk" | tee apk-paths.txt
-
-      # ─── Upload APK as artifact ───────────────────────────────────────────
+      # ─── Upload APK ───────────────────────────────────────────────────────
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
@@ -107,7 +87,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # ─── Print build summary ──────────────────────────────────────────────
+      # ─── Build summary ────────────────────────────────────────────────────
       - name: Build summary
         run: |
           echo "## ✅ H2 Tracker APK built successfully" >> $GITHUB_STEP_SUMMARY
@@ -115,15 +95,8 @@ jobs:
           echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| App | H2 Tracker |" >> $GITHUB_STEP_SUMMARY
-          echo "| Package | com.h2tracker.localapp |" >> $GITHUB_STEP_SUMMARY
           echo "| Author | ovrrpo |" >> $GITHUB_STEP_SUMMARY
           echo "| Build # | ${{ github.run_number }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
           APK_SIZE=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || echo "N/A")
           echo "| APK size (bytes) | $APK_SIZE |" >> $GITHUB_STEP_SUMMARY
-     #---Ignoring the clutter----
-      - name: Remove clutter files
-        run: |
-         rm -rf dev-dist/
-         rm -f metadata.json
-         echo "Cleaned up generated and platform-specific files"
