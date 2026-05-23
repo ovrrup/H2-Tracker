@@ -103,7 +103,7 @@ jobs:
       #     Reads 'assets/icon.png' and creates all required Android icon sizes
       # ════════════════════════════════════════════════════════════════════════
       - name: Generate App Icons
-        run: npx @capacitor/public generate --android
+        run: npx @capacitor/assets generate --assetPath ./public --android
 
       # ════════════════════════════════════════════════════════════════════════
       # 9. BUMP versionCode + versionName
