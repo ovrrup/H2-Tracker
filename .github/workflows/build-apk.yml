@@ -97,7 +97,7 @@ jobs:
       # 8. ADD ANDROID PLATFORM (scaffold only, no sync yet)
       # ════════════════════════════════════════════════════════════════════════
       - name: Add Android platform
-        run: npx cap add android --no-sync
+        run: npx cap add android
 
       # ════════════════════════════════════════════════════════════════════════
       # 9. BUMP versionCode + versionName
