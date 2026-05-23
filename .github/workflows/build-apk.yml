@@ -3,11 +3,11 @@ name: Build H2 Tracker APK
 on:
   push:
     branches:
-      - main
+      - remote
       - master
   pull_request:
     branches:
-      - main
+      - remote
       - master
   workflow_dispatch:
 
@@ -34,13 +34,13 @@ jobs:
           cache: 'npm'
 
       # ════════════════════════════════════════════════════════════════════════
-      # 3. JAVA 17
+      # 3. JAVA 21
       # ════════════════════════════════════════════════════════════════════════
-      - name: Set up Java 17
+      - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       # ════════════════════════════════════════════════════════════════════════
       # 4. ANDROID SDK
