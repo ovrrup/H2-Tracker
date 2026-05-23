@@ -34,13 +34,13 @@ jobs:
           cache: 'npm'
 
       # ════════════════════════════════════════════════════════════════════════
-      # 3. JAVA 21  (required by Gradle & Android SDK)
+      # 3. JAVA 17  (required by Gradle & Android SDK)
       # ════════════════════════════════════════════════════════════════════════
-      - name: Set up Java 21
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
 
       # ════════════════════════════════════════════════════════════════════════
       # 4. ANDROID SDK
@@ -53,29 +53,38 @@ jobs:
       # ════════════════════════════════════════════════════════════════════════
       - name: Install dependencies
         run: npm ci
+
       # ════════════════════════════════════════════════════════════════════════
-      # 7. GENERATE ANDROID FRAMEWORK  (always fresh — no android/ in repo)
+      # 6. BUILD WEB ASSETS (Vite)
+      #    dist/ must exist before cap add/sync runs
       # ════════════════════════════════════════════════════════════════════════
-      - name: Generate Android framework via Capacitor
+      - name: Build web assets
         run: |
-          echo "── Generating a clean Android project with Capacitor ──"
-          npx cap add android
-          npx cap sync android
-          echo "── Android framework generated ──"
+          npm run build
+          echo "── dist/ contents ──"
+          ls -lh dist/
+
+      # ════════════════════════════════════════════════════════════════════════
+      # 7. ADD ANDROID PLATFORM
+      #    cap add only scaffolds the native project — does NOT need dist/
+      #    The --no-sync flag prevents it from trying to copy web assets yet
+      # ════════════════════════════════════════════════════════════════════════
+      - name: Add Android platform
+        run: |
+          echo "── Adding Android platform ──"
+          npx cap add android --no-sync
+          echo "── Android platform added ──"
 
       # ════════════════════════════════════════════════════════════════════════
       # 8. OVERLAY YOUR CUSTOM FILES
-      #    Any file you commit to  android-overrides/  in your repo will
-      #    overwrite the generated counterpart here, so your custom
-      #    AndroidManifest.xml, strings.xml, styles, icons, etc. are preserved.
+      #    Commit any file to android-overrides/ in your repo and it will
+      #    overwrite the generated counterpart — runs BEFORE sync so Capacitor
+      #    picks up your AndroidManifest.xml, icons, strings.xml, etc.
       #
-      #    Folder mapping (examples):
+      #    Folder structure mirrors android/ exactly, for example:
       #      android-overrides/app/src/main/AndroidManifest.xml
-      #        → android/app/src/main/AndroidManifest.xml
       #      android-overrides/app/src/main/res/values/strings.xml
-      #        → android/app/src/main/res/values/strings.xml
       #      android-overrides/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-      #        → android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
       # ════════════════════════════════════════════════════════════════════════
       - name: Apply custom file overrides
         run: |
@@ -84,23 +93,33 @@ jobs:
             cp -rv android-overrides/. android/
             echo "── Overrides applied ──"
           else
-            echo "── No android-overrides/ folder found, using generated files as-is ──"
+            echo "── No android-overrides/ folder — using generated files ──"
           fi
 
       # ════════════════════════════════════════════════════════════════════════
-      # 9. STAMP BUILD METADATA
+      # 9. SYNC CAPACITOR
+      #    NOW we sync — dist/ exists and custom files are already in place
+      # ════════════════════════════════════════════════════════════════════════
+      - name: Sync Capacitor into Android
+        run: |
+          echo "── Syncing web assets into Android project ──"
+          npx cap sync android
+          echo "── Sync complete ──"
+
+      # ════════════════════════════════════════════════════════════════════════
+      # 10. STAMP BUILD METADATA
       # ════════════════════════════════════════════════════════════════════════
       - name: Stamp build metadata
         run: |
           mkdir -p android/app/src/main/assets
-          echo "App:    H2 Tracker"          > android/app/src/main/assets/build-info.txt
-          echo "Author: ovrrpo"             >> android/app/src/main/assets/build-info.txt
-          echo "Build:  ${{ github.run_number }}" >> android/app/src/main/assets/build-info.txt
-          echo "Commit: ${{ github.sha }}"  >> android/app/src/main/assets/build-info.txt
-          echo "Date:   $(date -u)"         >> android/app/src/main/assets/build-info.txt
+          echo "App:    H2 Tracker"                    > android/app/src/main/assets/build-info.txt
+          echo "Author: ovrrpo"                       >> android/app/src/main/assets/build-info.txt
+          echo "Build:  ${{ github.run_number }}"     >> android/app/src/main/assets/build-info.txt
+          echo "Commit: ${{ github.sha }}"            >> android/app/src/main/assets/build-info.txt
+          echo "Date:   $(date -u)"                   >> android/app/src/main/assets/build-info.txt
 
       # ════════════════════════════════════════════════════════════════════════
-      # 10. BUILD DEBUG APK
+      # 11. BUILD DEBUG APK
       # ════════════════════════════════════════════════════════════════════════
       - name: Build debug APK
         working-directory: android
@@ -111,7 +130,7 @@ jobs:
           ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
       # ════════════════════════════════════════════════════════════════════════
-      # 11. BUILD SIGNED RELEASE APK
+      # 12. BUILD SIGNED RELEASE APK
       #     ─────────────────────────────────────────────────────────────────
       #     HOW TO ENABLE:
       #       1. Generate a keystore on your machine:
@@ -125,7 +144,7 @@ jobs:
       #            KEY_ALIAS         ← e.g.  h2tracker
       #            KEY_PASSWORD      ← password you chose for the key
       #            STORE_PASSWORD    ← password you chose for the keystore
-      #       4. Remove the leading  '#'  from every line in this block.
+      #       4. Remove the leading '#' from every line in this block.
       #     ─────────────────────────────────────────────────────────────────
       # - name: Decode keystore
       #   run: |
@@ -153,7 +172,7 @@ jobs:
       #     retention-days: 90
 
       # ════════════════════════════════════════════════════════════════════════
-      # 12. UPLOAD DEBUG APK
+      # 13. UPLOAD DEBUG APK
       # ════════════════════════════════════════════════════════════════════════
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -164,7 +183,7 @@ jobs:
           retention-days: 30
 
       # ════════════════════════════════════════════════════════════════════════
-      # 13. BUILD SUMMARY
+      # 14. BUILD SUMMARY
       # ════════════════════════════════════════════════════════════════════════
       - name: Build summary
         run: |
