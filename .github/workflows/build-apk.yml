@@ -51,8 +51,10 @@ jobs:
           VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
 
       # ─── Sync Capacitor → Android ─────────────────────────────────────────
-      - name: Sync Capacitor
-        run: npx cap sync android
+      - name: Add & Sync Capacitor Android
+          run: |
+            npx cap add android
+            npx cap sync android
 
       # ─── Patch app name & author in build metadata ────────────────────────
       - name: Set app metadata
@@ -62,16 +64,13 @@ jobs:
           echo "Built by ovrrpo – H2 Tracker" > android/app/src/main/assets/build-info.txt
 
       # ─── Make Gradle wrapper executable ──────────────────────────────────
-      - name: Make Gradle wrapper executable
-        run: chmod +x android/gradlew
-
+    
       # ─── Build debug APK ─────────────────────────────────────────────────
       - name: Build debug APK
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon --stacktrace
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-
+          run: |
+           chmod +x gradlew
+           ./gradlew assembleDebug --no-daemon --stacktrace
       # ─── (Optional) Build release APK signed with a keystore ─────────────
       # Uncomment this block and add the secrets below to your repo to get
       # a release-signed APK instead of (or in addition to) the debug one.
