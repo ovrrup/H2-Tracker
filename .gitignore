@@ -1,8 +1,87 @@
+# ─── Dependencies ─────────────────────────────────────────────────────────────
 node_modules/
-build/
+.pnp
+.pnp.js
+
+# ─── Build outputs ─────────────────────────────────────────────────────────────
 dist/
-coverage/
-.DS_Store
-*.log
-.env*
+build/
+out/
+
+# ─── Vite PWA – generated service worker files (auto-rebuilt on every dev run) ─
+dev-dist/
+public/sw.js
+public/workbox-*.js
+public/registerSW.js
+sw.js
+workbox-*.js
+
+# ─── Capacitor ─────────────────────────────────────────────────────────────────
+# Sync these with: npx cap sync
+# The android/ folder is generated; only commit it if you manage native code
+# android/
+ios/
+
+# ─── Android build artifacts ───────────────────────────────────────────────────
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/app/release/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# ─── Environment & secrets ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+# Keep the example file as documentation
 !.env.example
+
+# ─── AI Studio / platform-specific metadata ────────────────────────────────────
+metadata.json
+
+# ─── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+
+# ─── OS clutter ────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ─── Editor & IDE ──────────────────────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+
+# ─── TypeScript ────────────────────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Testing & coverage ────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ─── Misc ──────────────────────────────────────────────────────────────────────
+.cache/
+.temp/
+.tmp/
