@@ -34,13 +34,13 @@ jobs:
           cache: 'npm'
 
       # ════════════════════════════════════════════════════════════════════════
-      # 3. JAVA 17  (required by Gradle & Android SDK)
+      # 3. JAVA 21  (required by Gradle & Android SDK)
       # ════════════════════════════════════════════════════════════════════════
-      - name: Set up Java 17
+      - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       # ════════════════════════════════════════════════════════════════════════
       # 4. ANDROID SDK
@@ -63,7 +63,7 @@ jobs:
           npm run build
           echo "── dist/ contents ──"
           ls -lh dist/
-
+          
       # ════════════════════════════════════════════════════════════════════════
       # 7. ADD ANDROID PLATFORM
       #    cap add only scaffolds the native project — does NOT need dist/
