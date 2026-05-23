@@ -5,8 +5,6 @@ import App from './App.tsx';
 import './index.css';
 
 // Register Service Worker for robust 100% offline local capability
-import { registerSW } from 'virtual:pwa-register';
-
 if ('serviceWorker' in navigator) {
   const updateSW = registerSW({
     onNeedRefresh() {
