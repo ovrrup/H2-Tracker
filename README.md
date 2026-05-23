@@ -9,7 +9,7 @@
 <br/>
 
 ![Build APK](https://img.shields.io/github/actions/workflow/status/ovrrup/H2-Tracker/build-apk.yml?style=flat-square&label=Build%20APK&logo=githubactions&logoColor=white)
-![License](https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 ![Built by](https://img.shields.io/badge/built%20by-ovrrpo-9333ea?style=flat-square)
 
 </div>
