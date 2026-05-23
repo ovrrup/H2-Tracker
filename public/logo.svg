@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Vibrant Emerald to Indigo Gradient matching our UI palette -->
+    <linearGradient id="emIndigoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" /> <!-- Emerald 500 -->
+      <stop offset="100%" stop-color="#6366f1" /> <!-- Indigo 500 -->
+    </linearGradient>
+    <filter id="subtleGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- App Icon Base Background -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#09090b" stroke="#1f2937" stroke-width="8" />
+
+  <!-- Outer circular tracker ring mimicking progress/goals loops -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#1f2937" stroke-width="16" />
+  <path d="M 256 96 A 160 160 0 1 1 144 370" fill="none" stroke="url(#emIndigoGrad)" stroke-width="16" stroke-linecap="round" />
+
+  <!-- Center Icon: Sleek biological water droplet merged with a sharp positive checkmark -->
+  <g transform="translate(196, 170)" filter="url(#subtleGlow)">
+    <!-- Elegant Droplet Outer curve -->
+    <path d="M 60 0 C 60 0 120 70 120 110 A 60 60 0 1 1 0 110 C 0 70 60 0 60 0 Z" fill="url(#emIndigoGrad)" />
+    
+    <!-- Clean negative cutout forming a completion checkmark -->
+    <path d="M 38 105 L 54 121 L 86 85" fill="none" stroke="#09090b" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

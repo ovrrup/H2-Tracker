@@ -1,0 +1,6 @@
+{
+  "name": "H2 Tracker",
+  "description": "An Android-style tracking application for habits, goals, water intake, sleep cycles, and workout health statistics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
