@@ -122,3 +122,9 @@ jobs:
           echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
           APK_SIZE=$(stat -c%s android/app/build/outputs/apk/debug/app-debug.apk 2>/dev/null || echo "N/A")
           echo "| APK size (bytes) | $APK_SIZE |" >> $GITHUB_STEP_SUMMARY
+     #---Ignoring the clutter----
+      - name: Remove clutter files
+        run: |
+         rm -rf dev-dist/
+         rm -f metadata.json
+         echo "Cleaned up generated and platform-specific files"
