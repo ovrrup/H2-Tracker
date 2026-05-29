@@ -1,7 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, ShieldAlert, Sparkles, Send, Trash2, Settings, CheckCircle, Volume2, Info, TriangleAlert } from 'lucide-react';
+import {
+  Bell,
+  ShieldAlert,
+  Sparkles,
+  Send,
+  Trash2,
+  Settings,
+  CheckCircle,
+  Volume2,
+  Info,
+  TriangleAlert,
+  Download,
+  Upload,
+} from 'lucide-react';
 import { Habit, Goal, DailyWaterLog, NotificationSettings } from '../types';
-import { getNotificationSettings, saveNotificationSettings, clearLocalStorageData } from '../lib/storage';
+import {
+  getNotificationSettings,
+  saveNotificationSettings,
+  clearLocalStorageData,
+  exportAppData,
+  importAppData,
+} from '../lib/storage';
 import { triggerHaptic } from '../lib/haptic';
 
 interface SettingsTabProps {
