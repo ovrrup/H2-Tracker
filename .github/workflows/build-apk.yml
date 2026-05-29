@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - remote
+      - featureBackup
       - master
   pull_request:
     branches:
       - remote
+      - featureBackup
       - master
   workflow_dispatch:
 
